@@ -1,0 +1,36 @@
+import pandas as pd
+
+# --- 1. Load Data ---
+# Load the Excel file into a pandas DataFrame
+df = pd.read_excel('/content/Restaurant.xlsx')
+
+print("First 5 rows of the DataFrame:")
+display(df.head())
+print("\nDataFrame Info:")
+df.info()
+
+# --- 2. Percentage of restaurants with both table booking and online delivery ---
+print("\n--- Analysis 1: Restaurants with both Table Booking and Online Delivery ---")
+restaurants_with_both = df[(df['Has Table booking'] == 'Yes') & (df['Has Online delivery'] == 'Yes')]
+total_restaurants = len(df)
+num_restaurants_with_both = len(restaurants_with_both)
+percentage_with_both = (num_restaurants_with_both / total_restaurants) * 100 if total_restaurants > 0 else 0
+
+print(f"Number of restaurants with both table booking and online delivery: {num_restaurants_with_both}")
+print(f"Total number of restaurants: {total_restaurants}")
+print(f"Percentage of restaurants offering both table booking and online delivery: {percentage_with_both:.2f}%")
+
+# --- 3. Compare average ratings of restaurants with and without table booking ---
+print("\n--- Analysis 2: Average Ratings by Table Booking Availability ---")
+average_ratings_by_table_booking = df.groupby('Has Table booking')['Aggregate rating'].mean()
+print("Average ratings of restaurants based on table booking availability:")
+display(average_ratings_by_table_booking)
+
+# --- 4. Availability of online delivery by price range ---
+print("\n--- Analysis 3: Availability of Online Delivery by Price Range ---")
+delivery_by_price_range = df.groupby(['Price range', 'Has Online delivery']).size().unstack(fill_value=0)
+delivery_by_price_range['Total'] = delivery_by_price_range.sum(axis=1)
+delivery_by_price_range['Percentage with Online Delivery'] = (delivery_by_price_range['Yes'] / delivery_by_price_range['Total']) * 100
+
+print("Availability of Online Delivery by Price Range:")
+display(delivery_by_price_range)
